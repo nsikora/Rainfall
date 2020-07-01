@@ -1,0 +1,36 @@
+A travers ce binaire, on se rend compte de plusieurs choses:
+
+- On a deux arguments a ajouter pour l'executer:
+	- Le premier ayant pour limite 20 caracteres
+	- Le second pouvant contenir autant de caracteres que posssible
+
+- Une fonction 'm' qui affiche le retour de la variable 'c'
+
+- la variable 'c' recupere le path du fichier '.pass' grace a son appel dans la fonction 'fgets'
+  qui le prend en argument, ainsi que le fichier 'file' a ouvrir.
+
+- Une fonction 'puts' quelquconque est appellee apres le fgets.
+
+Il nous suffit alors d'executer la fonction 'm' qui va afficher notre variable 'c' a la place de 'puts'.
+Pour se faire, il nous suffit juste de donner l'adresse de la fonction 'm' a la fonction 'puts'.
+
+Cela nouss est possible grace aux appels de fonction:
+
+- strcpy(var1[1], av[1]);
+- strcpy(var3[1], av[2]);
+
+qui nous permettra d'ecraser une adresse memoire, notamment celle de la fonction 'puts'.
+
+Pour trouver l'adresse de 'puts', on utilise la commande suivante:
+
+"objdump -R level7"
+
+qui nous donne l'adresse 0x08049928
+
+On va alors appeller la fonction 'level7', effectuer un overflow sur le premier argument qui va pointer l'adresse
+de la fonction 'puts', et ecrire l'adresse de la fonction 'm' lors de l'appel du second argument,
+ce qui nous donne la commande suivante:
+
+"/level7 $(python -c "print 'a'*20 + '\x28\x99\x04\x08'") $(python -c "print '\xf4\x84\x04\x08'")"
+
+On obtient alors le flag sur notre sortie standard.

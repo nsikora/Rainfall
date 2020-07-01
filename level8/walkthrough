@@ -1,0 +1,7 @@
+Apres avoir traduit l'asm pour avoir le source, nous nous sommes rendu compte que
+auth et service sont deux variable qui se suivent en memoire. Il suffit donc
+de initialiser auth, puis service en lui ajoutant 31 caracteres qui seront copie en memoire.
+Ensuite il suffit d'utiliser login pour qui il est la comparaison
+auth& + 32 != '\0' et que /bin/sh soit execute.
+
+python -c "print 'auth ' + '\n' + 'service' + 'a' * 31 + '\n' + 'login'" > /tmp/level9

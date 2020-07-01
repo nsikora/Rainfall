@@ -1,0 +1,19 @@
+Nous avons commence par inspecter le binaire fourni.
+Nous avons trouve trois fonctions main, run, frame_dummy
+Nous avons dessassemble les trois fonctions et dans run nous avons trouve
+la fonction systeme qui permet de executer des binaires.
+Dans le main, il n'y a pas d'appels a run, et il y a un gets qui est une fonction
+dangereuse car elle n'est pas protege contre les bufferoverflow.
+Il s'agissait ici de trouver l'offset, puis de rajouter l'adresse de run pour
+que le binaire execute system et ouvre une invite de commande.
+
+Nous avons donc cherche l'offset, qui est de 76. Puis nous avons cherche l'ardresse
+de run "0x08048444"
+
+
+On a fait ensuite:
+
+python -c "print 'A' * 76 + '\x44\x84\x04\x08'" > /tmp/to_send
+cat /tmp/to_send - | ./level1
+cd ../level2
+cat .pass

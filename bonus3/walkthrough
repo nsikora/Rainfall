@@ -1,0 +1,14 @@
+En analysant le source du binaire on peut remarquer que ce dernier va lire le
+.pass du level et l'afficher dans puts. Malheuseument il va lui additionner
+66 byte ce qui empechera l'affichage du contenu.
+On peut aussi obsrever que il y a un atoi mais malheureusement le atoi
+ne fait rien. Il y a pas de buffer overflow car impossible de passer de chaine de
+caractere. Nous avons donc essaye de passer une chaine vide en parametre
+cela nous a semble evident car il ecrase ce qui a ete ecrit apres avoir lu
+le fichier et qu'ensuite il le compare avec le premier argument.
+
+./bonus3 ""
+
+cd
+cd end
+cat .pass
